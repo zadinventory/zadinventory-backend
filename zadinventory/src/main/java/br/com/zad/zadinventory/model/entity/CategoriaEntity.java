@@ -1,7 +1,10 @@
 package br.com.zad.zadinventory.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "categorias")
@@ -20,4 +23,8 @@ public class CategoriaEntity {
 
     @Column
     private String descricao;
+
+    @OneToMany(mappedBy = "categoria")
+    @JsonIgnore
+    private List<ProdutoEntity> produtos;
 }

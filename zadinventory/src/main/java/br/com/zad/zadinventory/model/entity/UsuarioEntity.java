@@ -1,8 +1,11 @@
 package br.com.zad.zadinventory.model.entity;
 
 import br.com.zad.zadinventory.model.enums.TipoUsuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -26,4 +29,8 @@ public class UsuarioEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoUsuario tipoUsuario;
+
+    @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
+    private List<ProdutoEntity> produtos;
 }

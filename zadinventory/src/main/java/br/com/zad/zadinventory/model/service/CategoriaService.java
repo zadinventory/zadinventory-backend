@@ -43,8 +43,13 @@ public class CategoriaService {
         CategoriaEntity categoria = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada!"));
 
-        categoria.setNome(categoriaAtualizada.getNome());
-        categoria.setDescricao(categoriaAtualizada.getDescricao());
+        if (categoriaAtualizada.getNome() != null) {
+            validarNomeCategoria(categoriaAtualizada.getNome(), id);
+            categoria.setNome(categoriaAtualizada.getNome());
+        }
+        if (categoriaAtualizada.getDescricao() != null) {
+            categoria.setDescricao(categoriaAtualizada.getDescricao());
+        }
 
         return repository.save(categoria);
     }
@@ -58,8 +63,17 @@ public class CategoriaService {
         if (categoria.getNome() == null || categoria.getNome().trim().isEmpty()) {
             throw new IllegalArgumentException("Nome da categoria é obrigatório!");
         }
-        if (repository.existsByNome(categoria.getNome())) {
-            throw new IllegalArgumentException("Categoria já existe!");
+        validarNomeCategoria(categoria.getNome(), categoria.getId());
+    }
+
+    private void validarNomeCategoria(String nome, Long id) {
+        boolean nomeExiste = repository.existsByNome(nome);
+        boolean ehAtualizacao = id != null;
+
+        if (nomeExiste) {
+            if (!ehAtualizacao || !repository.findById(id).get().getNome().equals(nome)) {
+                throw new IllegalArgumentException("Categoria já existe!");
+            }
         }
     }
 }
