@@ -1,14 +1,17 @@
 package app.zad.zadinventory.model.service;
 
 import app.zad.zadinventory.model.entity.OperacaoEntity;
+import app.zad.zadinventory.model.entity.ProdutoEntity;
+import app.zad.zadinventory.model.entity.UsuarioEntity;
 import app.zad.zadinventory.model.enums.Situacao;
 import app.zad.zadinventory.model.exception.RegraNegocioException;
 import app.zad.zadinventory.model.repository.OperacaoRepository;
+import app.zad.zadinventory.model.repository.ProdutoRepository;
+import app.zad.zadinventory.model.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,14 +19,22 @@ import java.util.List;
 public class OperacaoService {
 
     private final OperacaoRepository repository;
+    private final ProdutoRepository produtoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public OperacaoEntity salvar(OperacaoEntity operacao) {
         validarOperacao(operacao);
 
-        if (operacao.getData() == null) {
-            operacao.setData(LocalDateTime.now());
-        }
+        // Carrega as entidades completas do banco
+        ProdutoEntity produto = produtoRepository.findById(operacao.getProduto().getId())
+                .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + operacao.getProduto().getId()));
+
+        UsuarioEntity usuario = usuarioRepository.findById(operacao.getUsuario().getId())
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + operacao.getUsuario().getId()));
+
+        operacao.setProduto(produto);
+        operacao.setUsuario(usuario);
 
         return repository.save(operacao);
     }
@@ -47,10 +58,6 @@ public class OperacaoService {
 
     public List<OperacaoEntity> buscarPorUsuario(Long usuarioId) {
         return repository.findByUsuarioId(usuarioId);
-    }
-
-    public List<OperacaoEntity> buscarRecentes(LocalDateTime data) {
-        return repository.findByDataAfter(data);
     }
 
     @Transactional

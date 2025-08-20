@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -45,11 +44,6 @@ public class OperacaoController {
     @GetMapping("/por-usuario/{usuarioId}")
     public ResponseEntity<List<OperacaoEntity>> buscarPorUsuario(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(service.buscarPorUsuario(usuarioId));
-    }
-
-    @GetMapping("/recentes")
-    public ResponseEntity<List<OperacaoEntity>> buscarRecentes(@RequestParam LocalDateTime data) {
-        return ResponseEntity.ok(service.buscarRecentes(data));
     }
 
     @PatchMapping("/{id}/situacao")
