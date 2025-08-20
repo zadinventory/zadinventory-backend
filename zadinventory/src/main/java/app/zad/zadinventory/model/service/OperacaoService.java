@@ -67,6 +67,31 @@ public class OperacaoService {
         return repository.save(operacao);
     }
 
+    @Transactional
+    public OperacaoEntity atualizar(Long id, OperacaoEntity operacaoAtualizada) {
+        OperacaoEntity operacaoExistente = buscarPorId(id);
+
+        // Atualiza a situação se for fornecida
+        if (operacaoAtualizada.getSituacao() != null) {
+            operacaoExistente.setSituacao(operacaoAtualizada.getSituacao());
+        }
+
+        // Atualiza o produto se for fornecido
+        if (operacaoAtualizada.getProduto() != null && operacaoAtualizada.getProduto().getId() != null) {
+            ProdutoEntity produto = produtoRepository.findById(operacaoAtualizada.getProduto().getId())
+                    .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + operacaoAtualizada.getProduto().getId()));
+            operacaoExistente.setProduto(produto);
+        }
+
+        // Atualiza o usuário se for fornecido
+        if (operacaoAtualizada.getUsuario() != null && operacaoAtualizada.getUsuario().getId() != null) {
+            UsuarioEntity usuario = usuarioRepository.findById(operacaoAtualizada.getUsuario().getId())
+                    .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + operacaoAtualizada.getUsuario().getId()));
+            operacaoExistente.setUsuario(usuario);
+        }
+
+        return repository.save(operacaoExistente);
+    }
     private void validarOperacao(OperacaoEntity operacao) {
         if (operacao.getProduto() == null || operacao.getProduto().getId() == null) {
             throw new RegraNegocioException("Produto é obrigatório!");
