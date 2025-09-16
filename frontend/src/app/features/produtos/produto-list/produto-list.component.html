@@ -1,0 +1,32 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Produtos</h2>
+  <button class="btn btn-primary" (click)="novo()">Novo Produto</button>
+</div>
+
+<table class="table table-striped table-bordered">
+  <thead class="table-dark">
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Descrição</th>
+      <th>Preço</th>
+      <th>Quantidade</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (p of produtos; track p.id) {
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.nome }}</td>
+        <td>{{ p.descricao }}</td>
+        <td>{{ p.preco | currency:'BRL' }}</td>
+        <td>{{ p.quantidade }}</td>
+        <td>
+          <button class="btn btn-sm btn-warning me-2" (click)="editar(p)">Editar</button>
+          <button class="btn btn-sm btn-danger" (click)="excluir(p)">Excluir</button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

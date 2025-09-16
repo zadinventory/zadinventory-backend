@@ -1,0 +1,37 @@
+<div class="container">
+  <h2>{{ produtoId ? 'Editar Produto' : 'Novo Produto' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="salvar()" class="mt-3">
+    <div class="mb-3">
+      <label class="form-label">Nome</label>
+      <input type="text" class="form-control" formControlName="nome" />
+      <div *ngIf="form.controls['nome'].invalid && form.controls['nome'].touched" class="text-danger">
+        Nome é obrigatório
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Descrição</label>
+      <textarea class="form-control" formControlName="descricao"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Preço</label>
+      <input type="number" class="form-control" formControlName="preco" />
+      <div *ngIf="form.controls['preco'].invalid && form.controls['preco'].touched" class="text-danger">
+        Preço deve ser maior ou igual a 0
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Quantidade</label>
+      <input type="number" class="form-control" formControlName="quantidade" />
+      <div *ngIf="form.controls['quantidade'].invalid && form.controls['quantidade'].touched" class="text-danger">
+        Quantidade deve ser maior ou igual a 0
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success" [disabled]="form.invalid">Salvar</button>
+    <a routerLink="/produtos" class="btn btn-secondary ms-2">Cancelar</a>
+  </form>
+</div>
