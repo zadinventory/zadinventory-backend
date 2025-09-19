@@ -9,9 +9,16 @@ export const routes: Routes = [
       {
         path: 'produtos',
         loadComponent: () =>
-          import('./features/produtos/produto-list/produto-list.component').then(
-            (m) => m.ProdutoListComponent
-          ),
+          import(
+            './features/produtos/produto-list/produto-list.component'
+          ).then((m) => m.ProdutoListComponent),
+      },
+      {
+        path: 'produtos/novo',
+        loadComponent: () =>
+          import(
+            './features/produtos/produto-form/produto-form.component'
+          ).then((m) => m.ProdutoFormComponent),
       },
       {
         path: 'vendas',
@@ -23,9 +30,9 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         loadComponent: () =>
-          import('./features/usuarios/usuario-list/usuario-list.component').then(
-            (m) => m.UsuarioListComponent
-          ),
+          import(
+            './features/usuarios/usuario-list/usuario-list.component'
+          ).then((m) => m.UsuarioListComponent),
       },
       { path: '', redirectTo: 'produtos', pathMatch: 'full' },
     ],
@@ -33,7 +40,9 @@ export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+      import('./features/auth/login/login.component').then(
+        (m) => m.LoginComponent
+      ),
   },
   { path: '**', redirectTo: 'produtos' },
 ];

@@ -1,13 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ProdutosService } from '../../../core/services/produtos.service';
 import { Produto } from '../../../shared/models/produto';
 
 @Component({
   selector: 'app-produto-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './produto-list.component.html'
 })
 export class ProdutoListComponent implements OnInit {
@@ -18,6 +19,10 @@ export class ProdutoListComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregar();
+  }
+
+  trackById(index: number, item: Produto): number {
+    return item.id!;
   }
 
   carregar() {
