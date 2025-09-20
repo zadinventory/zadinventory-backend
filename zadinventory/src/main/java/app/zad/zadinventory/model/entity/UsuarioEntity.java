@@ -39,4 +39,6 @@ public class UsuarioEntity {
     @OneToMany(mappedBy = "usuario")
     @JsonIgnoreProperties({"usuario", "hibernateLazyInitializer", "handler"})
     private List<ProdutoEntity> produtos;
+
+    private String nome;
 }
