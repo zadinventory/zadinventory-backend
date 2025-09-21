@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class ProdutoEntity {
 
     @Min(value = 0, message = "Quantidade não pode ser negativa")
     private Integer quantidade;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    @NotNull(message = "Preço é obrigatório")
+    @Min(value = 0, message = "Preço não pode ser negativo")
+    private BigDecimal preco;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id", nullable = false)
