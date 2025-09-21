@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class ProdutoService {
     private final ProdutoRepository repository;
     private final CategoriaRepository categoriaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final TagRepository tagRepository; // Novo
+    private final TagRepository tagRepository;
 
     @Transactional
     public ProdutoEntity salvar(ProdutoEntity produto) {
@@ -32,6 +33,10 @@ public class ProdutoService {
 
         if (produto.getQuantidade() == null) {
             produto.setQuantidade(0);
+        }
+
+        if (produto.getPreco() == null) {
+            produto.setPreco(BigDecimal.ZERO);
         }
 
         // Carregar tags explicitamente
@@ -80,6 +85,9 @@ public class ProdutoService {
         if (produtoAtualizado.getQuantidade() != null) {
             produtoExistente.setQuantidade(produtoAtualizado.getQuantidade());
         }
+        if (produtoAtualizado.getPreco() != null) {
+            produtoExistente.setPreco(produtoAtualizado.getPreco());
+        }
 
         if (produtoAtualizado.getCategoria() != null && produtoAtualizado.getCategoria().getId() != null) {
             CategoriaEntity categoria = categoriaRepository.findById(produtoAtualizado.getCategoria().getId())
@@ -116,6 +124,9 @@ public class ProdutoService {
         }
         if (produto.getQuantidade() != null && produto.getQuantidade() < 0) {
             throw new RegraNegocioException("Quantidade não pode ser negativa!");
+        }
+        if (produto.getPreco() != null && produto.getPreco().compareTo(BigDecimal.ZERO) < 0) {
+            throw new RegraNegocioException("Preço não pode ser negativo!");
         }
         if (produto.getUsuario() == null || produto.getUsuario().getId() == null) {
             throw new RegraNegocioException("Usuário é obrigatório!");
