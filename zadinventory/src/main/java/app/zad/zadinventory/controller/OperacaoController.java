@@ -2,6 +2,7 @@ package app.zad.zadinventory.controller;
 
 import app.zad.zadinventory.controller.dto.OperacoesDto;
 import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.TotalVendasDto;
 import app.zad.zadinventory.model.entity.OperacaoEntity;
 import app.zad.zadinventory.model.enums.Situacao;
 import app.zad.zadinventory.model.repository.OperacaoRepository;
@@ -9,6 +10,7 @@ import app.zad.zadinventory.model.service.OperacaoService;
 import app.zad.zadinventory.model.service.ProdutoService;
 import app.zad.zadinventory.model.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,9 +87,11 @@ public class OperacaoController {
         return ResponseEntity.ok(service.atualizarSituacao(id, novaSituacao));
     }
 
-    @GetMapping("/relatorio-vendas")
-    public ResponseEntity<Long> getTotalVendas(@RequestParam LocalDate inicio, @RequestParam LocalDate fim) {
-        Long totalVendas = service.totalVendasNoRange(inicio, fim);
-        return ResponseEntity.ok(totalVendas);
+    @GetMapping("/total-vendas")
+    public ResponseEntity<TotalVendasDto> totalVendas(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+        return ResponseEntity.ok(service.totalVendas(inicio, fim));
     }
 }

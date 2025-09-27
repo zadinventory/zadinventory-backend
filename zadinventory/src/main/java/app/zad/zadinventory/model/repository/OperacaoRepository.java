@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,9 @@ public interface OperacaoRepository extends JpaRepository<OperacaoEntity, Long> 
     @Query("SELECT o FROM OperacaoEntity o WHERE o.usuario.id = :usuarioId")
     List<OperacaoEntity> findByUsuarioId(@Param("usuarioId") Long usuarioId);
 
-    @Query("SELECT COUNT(o) FROM OperacaoEntity o WHERE o.diaOperacao BETWEEN :inicio AND :fim")
-    Long countByDiaOperacaoBetween(LocalDate inicio, LocalDate fim);
+    @Query("SELECT SUM (o.quantidade) FROM OperacaoEntity o WHERE  o.diaOperacao BETWEEN :inicio AND :fim AND o.situacao = 'REALIZADA'")
+    Long somaQuantidadePorPeriodo(@Param("inicio") LocalDate inicio,@Param("fim") LocalDate fim);
+
+    @Query("SELECT SUM (o.valorTotal) FROM OperacaoEntity o WHERE o.diaOperacao BETWEEN :inicio AND :fim AND o.situacao = 'REALIZADA'")
+    BigDecimal somaValorTotalPorPeriodo(@Param("inicio") LocalDate inicio,@Param("fim") LocalDate fim);
 }

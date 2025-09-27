@@ -1,6 +1,7 @@
 package app.zad.zadinventory.model.service;
 
 import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.TotalVendasDto;
 import app.zad.zadinventory.model.entity.OperacaoEntity;
 import app.zad.zadinventory.model.entity.ProdutoEntity;
 import app.zad.zadinventory.model.entity.UsuarioEntity;
@@ -124,7 +125,11 @@ public class OperacaoService {
         }
     }
 
-    public Long totalVendasNoRange(LocalDate inicio, LocalDate fim) {
-        return repository.countByDiaOperacaoBetween(inicio, fim);
+    public TotalVendasDto totalVendas(LocalDate inicio, LocalDate fim) {
+        Long quantidadeTotal = repository.somaQuantidadePorPeriodo(inicio, fim);
+        BigDecimal valorTotal = repository.somaValorTotalPorPeriodo(inicio, fim);
+
+        return new TotalVendasDto(quantidadeTotal != null ? quantidadeTotal :0L,
+                valorTotal != null ? valorTotal : BigDecimal.ZERO);
     }
 }
