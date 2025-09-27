@@ -2,6 +2,7 @@ package app.zad.zadinventory.controller;
 
 import app.zad.zadinventory.controller.dto.OperacoesDto;
 import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.RelatorioVendasProdutoDto;
 import app.zad.zadinventory.controller.dto.TotalVendasDto;
 import app.zad.zadinventory.model.entity.OperacaoEntity;
 import app.zad.zadinventory.model.enums.Situacao;
@@ -93,5 +94,14 @@ public class OperacaoController {
             @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
     ) {
         return ResponseEntity.ok(service.totalVendas(inicio, fim));
+    }
+
+    @GetMapping("/total-vendas-produto")
+    public ResponseEntity<List<RelatorioVendasProdutoDto>> relatorioVendasPorProduto(
+            @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam("fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ){
+
+        return ResponseEntity.ok(service.relatorioVendasPorProduto(inicio, fim));
     }
 }

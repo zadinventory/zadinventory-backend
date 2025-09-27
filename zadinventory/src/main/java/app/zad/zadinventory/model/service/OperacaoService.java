@@ -1,6 +1,7 @@
 package app.zad.zadinventory.model.service;
 
 import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.RelatorioVendasProdutoDto;
 import app.zad.zadinventory.controller.dto.TotalVendasDto;
 import app.zad.zadinventory.model.entity.OperacaoEntity;
 import app.zad.zadinventory.model.entity.ProdutoEntity;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -131,5 +133,18 @@ public class OperacaoService {
 
         return new TotalVendasDto(quantidadeTotal != null ? quantidadeTotal :0L,
                 valorTotal != null ? valorTotal : BigDecimal.ZERO);
+    }
+
+    public List<RelatorioVendasProdutoDto> relatorioVendasPorProduto(LocalDate inicio, LocalDate fim) {
+        List<Object[]> resultados = repository.relatorioVendasPorProduto(inicio, fim);
+
+        return resultados.stream()
+                .map(obj -> new RelatorioVendasProdutoDto(
+                        (Long) obj[0],
+                        (String) obj[1],
+                        (Long) obj[2],
+                        (obj[3] != null) ? (java.math.BigDecimal) obj[3] : java.math.BigDecimal.ZERO
+                ))
+                .collect(Collectors.toList());
     }
 }

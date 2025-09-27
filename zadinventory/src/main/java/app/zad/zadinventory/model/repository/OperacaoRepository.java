@@ -38,4 +38,13 @@ public interface OperacaoRepository extends JpaRepository<OperacaoEntity, Long> 
 
     @Query("SELECT SUM (o.valorTotal) FROM OperacaoEntity o WHERE o.diaOperacao BETWEEN :inicio AND :fim AND o.situacao = 'REALIZADA'")
     BigDecimal somaValorTotalPorPeriodo(@Param("inicio") LocalDate inicio,@Param("fim") LocalDate fim);
+
+    @Query("""
+           SELECT o.produto.id, o.produto.nome, SUM(o.quantidade), SUM(o.valorTotal)
+           FROM OperacaoEntity o
+           WHERE o.diaOperacao BETWEEN :inicio AND :fim
+             AND o.situacao = 'REALIZADA'
+           GROUP BY o.produto.id, o.produto.nome
+           """)
+    List<Object[]> relatorioVendasPorProduto(@Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
 }
