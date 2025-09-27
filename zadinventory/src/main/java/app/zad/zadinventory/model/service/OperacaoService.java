@@ -95,6 +95,19 @@ public class OperacaoService {
     @Transactional
     public OperacaoEntity atualizar(Long id, OperacaoEntity operacaoAtualizada) {
         OperacaoEntity operacaoExistente = buscarPorId(id);
+        ProdutoEntity produto = operacaoExistente.getProduto();
+
+        if (operacaoAtualizada.getSituacao() != null
+                && operacaoAtualizada.getSituacao() == Situacao.REALIZADA
+                && operacaoExistente.getSituacao() != Situacao.REALIZADA) {
+
+            if (produto.getQuantidade() < operacaoAtualizada.getQuantidade()) {
+                throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produto.getNome());
+            }
+
+            produto.setQuantidade(produto.getQuantidade() - operacaoAtualizada.getQuantidade());
+            produtoRepository.save(produto);
+        }
 
         // Atualiza a situação se for fornecida
         if (operacaoAtualizada.getSituacao() != null) {
@@ -103,7 +116,7 @@ public class OperacaoService {
 
         // Atualiza o produto se for fornecido
         if (operacaoAtualizada.getProduto() != null && operacaoAtualizada.getProduto().getId() != null) {
-            ProdutoEntity produto = produtoRepository.findById(operacaoAtualizada.getProduto().getId())
+            ProdutoEntity novoProduto = produtoRepository.findById(operacaoAtualizada.getProduto().getId())
                     .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + operacaoAtualizada.getProduto().getId()));
             operacaoExistente.setProduto(produto);
         }
