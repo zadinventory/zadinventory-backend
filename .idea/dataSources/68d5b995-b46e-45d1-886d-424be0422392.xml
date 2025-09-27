@@ -1099,214 +1099,218 @@ sys|schema||mysql.sys|localhost|TRIGGER|G</Grants>
       <Position>1</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="313" parent="300" name="produto_id">
+    <column id="313" parent="300" name="situacao">
       <NotNull>1</NotNull>
       <Position>2</Position>
-      <StoredType>bigint|0s</StoredType>
+      <StoredType>enum(&apos;CANCELADA&apos;, &apos;REALIZADA&apos;, &apos;SEPARADA&apos;)|0e</StoredType>
     </column>
-    <column id="314" parent="300" name="usuario_id">
+    <column id="314" parent="300" name="produto_id">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="315" parent="300" name="situacao">
+    <column id="315" parent="300" name="usuario_id">
       <NotNull>1</NotNull>
       <Position>4</Position>
-      <StoredType>enum(&apos;CANCELADA&apos;, &apos;REALIZADA&apos;, &apos;SEPARADA&apos;)|0e</StoredType>
+      <StoredType>bigint|0s</StoredType>
     </column>
-    <foreign-key id="316" parent="300" name="FKq0o2ly7bp1hf7pmfgasv48lwy">
+    <column id="316" parent="300" name="dia_operacao">
+      <Position>5</Position>
+      <StoredType>date|0s</StoredType>
+    </column>
+    <foreign-key id="317" parent="300" name="FKq0o2ly7bp1hf7pmfgasv48lwy">
       <ColNames>produto_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>produtos</RefTableName>
     </foreign-key>
-    <foreign-key id="317" parent="300" name="FKs0f2kko7ghtown18jbxiiw7bv">
+    <foreign-key id="318" parent="300" name="FKs0f2kko7ghtown18jbxiiw7bv">
       <ColNames>usuario_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>usuarios</RefTableName>
     </foreign-key>
-    <index id="318" parent="300" name="PRIMARY">
+    <index id="319" parent="300" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="319" parent="300" name="FKq0o2ly7bp1hf7pmfgasv48lwy">
+    <index id="320" parent="300" name="FKq0o2ly7bp1hf7pmfgasv48lwy">
       <ColNames>produto_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="320" parent="300" name="FKs0f2kko7ghtown18jbxiiw7bv">
+    <index id="321" parent="300" name="FKs0f2kko7ghtown18jbxiiw7bv">
       <ColNames>usuario_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="321" parent="300" name="PRIMARY">
+    <key id="322" parent="300" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="322" parent="301" name="produto_id">
+    <column id="323" parent="301" name="produto_id">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="323" parent="301" name="tag_id">
+    <column id="324" parent="301" name="tag_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <foreign-key id="324" parent="301" name="FKdkj6lhcvwjo1dpg38nf8h0stv">
+    <foreign-key id="325" parent="301" name="FKdkj6lhcvwjo1dpg38nf8h0stv">
       <ColNames>produto_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>produtos</RefTableName>
     </foreign-key>
-    <foreign-key id="325" parent="301" name="FKb2ntpqb43ia5yj9bb308tdve6">
+    <foreign-key id="326" parent="301" name="FKb2ntpqb43ia5yj9bb308tdve6">
       <ColNames>tag_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>tags</RefTableName>
     </foreign-key>
-    <index id="326" parent="301" name="FKdkj6lhcvwjo1dpg38nf8h0stv">
+    <index id="327" parent="301" name="FKdkj6lhcvwjo1dpg38nf8h0stv">
       <ColNames>produto_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="327" parent="301" name="FKb2ntpqb43ia5yj9bb308tdve6">
+    <index id="328" parent="301" name="FKb2ntpqb43ia5yj9bb308tdve6">
       <ColNames>tag_id</ColNames>
       <Type>btree</Type>
     </index>
-    <check id="328" parent="302" name="produtos_chk_1">
+    <check id="329" parent="302" name="produtos_chk_1">
       <NameSurrogate>1</NameSurrogate>
       <Predicate>`quantidade` &gt;= 0</Predicate>
     </check>
-    <column id="329" parent="302" name="quantidade">
+    <column id="330" parent="302" name="quantidade">
       <Position>1</Position>
       <StoredType>int|0s</StoredType>
     </column>
-    <column id="330" parent="302" name="categoria_id">
+    <column id="331" parent="302" name="categoria_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="331" parent="302" name="id">
+    <column id="332" parent="302" name="id">
       <AutoIncrement>1</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="332" parent="302" name="usuario_id">
+    <column id="333" parent="302" name="usuario_id">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="333" parent="302" name="descricao">
+    <column id="334" parent="302" name="descricao">
       <Position>5</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <column id="334" parent="302" name="nome">
+    <column id="335" parent="302" name="nome">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <foreign-key id="335" parent="302" name="FK8rqw0ljwdaom34jr2t46bjtrn">
+    <foreign-key id="336" parent="302" name="FK8rqw0ljwdaom34jr2t46bjtrn">
       <ColNames>categoria_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>categorias</RefTableName>
     </foreign-key>
-    <foreign-key id="336" parent="302" name="FKkkhscygci8sf4ccj5652rodan">
+    <foreign-key id="337" parent="302" name="FKkkhscygci8sf4ccj5652rodan">
       <ColNames>usuario_id</ColNames>
       <RefColNames>id</RefColNames>
       <RefTableName>usuarios</RefTableName>
     </foreign-key>
-    <index id="337" parent="302" name="PRIMARY">
+    <index id="338" parent="302" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="338" parent="302" name="FK8rqw0ljwdaom34jr2t46bjtrn">
+    <index id="339" parent="302" name="FK8rqw0ljwdaom34jr2t46bjtrn">
       <ColNames>categoria_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="339" parent="302" name="FKkkhscygci8sf4ccj5652rodan">
+    <index id="340" parent="302" name="FKkkhscygci8sf4ccj5652rodan">
       <ColNames>usuario_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="340" parent="302" name="PRIMARY">
+    <key id="341" parent="302" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <column id="341" parent="303" name="id">
+    <column id="342" parent="303" name="id">
       <AutoIncrement>1</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="342" parent="303" name="nome">
+    <column id="343" parent="303" name="nome">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <index id="343" parent="303" name="PRIMARY">
+    <index id="344" parent="303" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="344" parent="303" name="UKottj9u53x4vbaivltjqsg2cio">
+    <index id="345" parent="303" name="UKottj9u53x4vbaivltjqsg2cio">
       <ColNames>nome</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="345" parent="303" name="PRIMARY">
+    <key id="346" parent="303" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="346" parent="303" name="UKottj9u53x4vbaivltjqsg2cio">
+    <key id="347" parent="303" name="UKottj9u53x4vbaivltjqsg2cio">
       <UnderlyingIndexName>UKottj9u53x4vbaivltjqsg2cio</UnderlyingIndexName>
     </key>
-    <column id="347" parent="304" name="data_nascimento">
+    <column id="348" parent="304" name="data_nascimento">
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>date|0s</StoredType>
     </column>
-    <column id="348" parent="304" name="id">
+    <column id="349" parent="304" name="id">
       <AutoIncrement>1</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StoredType>bigint|0s</StoredType>
     </column>
-    <column id="349" parent="304" name="email">
+    <column id="350" parent="304" name="email">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <column id="350" parent="304" name="nome">
+    <column id="351" parent="304" name="nome">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <column id="351" parent="304" name="senha">
+    <column id="352" parent="304" name="senha">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StoredType>varchar(255)|0s</StoredType>
     </column>
-    <column id="352" parent="304" name="tipo_usuario">
+    <column id="353" parent="304" name="tipo_usuario">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StoredType>enum(&apos;FUNCIONARIO&apos;, &apos;GERENTE&apos;)|0e</StoredType>
     </column>
-    <index id="353" parent="304" name="PRIMARY">
+    <index id="354" parent="304" name="PRIMARY">
       <ColNames>id</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <index id="354" parent="304" name="UKkfsp0s1tflm1cwlj8idhqsad0">
+    <index id="355" parent="304" name="UKkfsp0s1tflm1cwlj8idhqsad0">
       <ColNames>email</ColNames>
       <Type>btree</Type>
       <Unique>1</Unique>
     </index>
-    <key id="355" parent="304" name="PRIMARY">
+    <key id="356" parent="304" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <Primary>1</Primary>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
-    <key id="356" parent="304" name="UKkfsp0s1tflm1cwlj8idhqsad0">
+    <key id="357" parent="304" name="UKkfsp0s1tflm1cwlj8idhqsad0">
       <UnderlyingIndexName>UKkfsp0s1tflm1cwlj8idhqsad0</UnderlyingIndexName>
     </key>
   </database-model>

@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "operacoes")
 @Getter
@@ -36,4 +39,6 @@ public class OperacaoEntity {
     @Column(nullable = false)
     @NotNull(message = "Situação é obrigatória")
     private Situacao situacao;
+
+    private LocalDate diaOperacao;
 }
