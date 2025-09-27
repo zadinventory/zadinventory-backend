@@ -1,5 +1,6 @@
 package app.zad.zadinventory.model.service;
 
+import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
 import app.zad.zadinventory.model.entity.OperacaoEntity;
 import app.zad.zadinventory.model.entity.ProdutoEntity;
 import app.zad.zadinventory.model.entity.UsuarioEntity;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -23,21 +26,38 @@ public class OperacaoService {
     private final UsuarioRepository usuarioRepository;
 
     @Transactional
-    public OperacaoEntity salvar(OperacaoEntity operacao) {
-        validarOperacao(operacao);
+    public OperacaoEntity salvar(OperacoesDTORequest dto) {
+        ProdutoEntity produto = produtoRepository.findById(dto.produtoId())
+                .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + dto.produtoId()));
 
-        // Carrega as entidades completas do banco
-        ProdutoEntity produto = produtoRepository.findById(operacao.getProduto().getId())
-                .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + operacao.getProduto().getId()));
+        UsuarioEntity usuario = usuarioRepository.findById(dto.usuarioId())
+                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + dto.usuarioId()));
 
-        UsuarioEntity usuario = usuarioRepository.findById(operacao.getUsuario().getId())
-                .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + operacao.getUsuario().getId()));
+        if (produto.getQuantidade() < dto.quantidade()) {
+            throw new RegraNegocioException("Estoque insuficiente para o produto: " + produto.getNome());
+        }
 
-        operacao.setProduto(produto);
-        operacao.setUsuario(usuario);
+        // Atualiza estoque
+        produto.setQuantidade(produto.getQuantidade() - dto.quantidade());
+        produtoRepository.save(produto);
+
+        // Calcula valor total
+        BigDecimal valorTotal = produto.getPreco()
+                .multiply(BigDecimal.valueOf(dto.quantidade()));
+
+        // Cria a operação
+        var operacao = OperacaoEntity.builder()
+                .produto(produto)
+                .usuario(usuario)
+                .situacao(Situacao.valueOf(dto.situacao().toUpperCase()))
+                .diaOperacao(dto.diaOperacao())
+                .quantidade(dto.quantidade())
+                .valorTotal(valorTotal)
+                .build();
 
         return repository.save(operacao);
     }
+
 
     public List<OperacaoEntity> buscarTodos() {
         return repository.findAll();
@@ -102,5 +122,9 @@ public class OperacaoService {
         if (operacao.getSituacao() == null) {
             throw new RegraNegocioException("Situação é obrigatória!");
         }
+    }
+
+    public Long totalVendasNoRange(LocalDate inicio, LocalDate fim) {
+        return repository.countByDiaOperacaoBetween(inicio, fim);
     }
 }

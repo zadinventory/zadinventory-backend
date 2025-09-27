@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +31,7 @@ public interface OperacaoRepository extends JpaRepository<OperacaoEntity, Long> 
     @EntityGraph(attributePaths = {"produto", "usuario"})
     @Query("SELECT o FROM OperacaoEntity o WHERE o.usuario.id = :usuarioId")
     List<OperacaoEntity> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+
+    @Query("SELECT COUNT(o) FROM OperacaoEntity o WHERE o.diaOperacao BETWEEN :inicio AND :fim")
+    Long countByDiaOperacaoBetween(LocalDate inicio, LocalDate fim);
 }

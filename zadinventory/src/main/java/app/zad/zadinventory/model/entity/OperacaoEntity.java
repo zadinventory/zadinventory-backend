@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -41,4 +42,9 @@ public class OperacaoEntity {
     private Situacao situacao;
 
     private LocalDate diaOperacao;
+
+    @NotNull(message = "Quantidade obrigatoria!")
+    private Integer quantidade;
+
+    private BigDecimal valorTotal;
 }

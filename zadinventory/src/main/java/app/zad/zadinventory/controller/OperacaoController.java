@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,26 +28,19 @@ public class OperacaoController {
 
     @PostMapping
     public ResponseEntity<OperacoesDto> criar(@RequestBody OperacoesDTORequest dto) {
-        var produto = produtoService.buscarPorId(dto.produtoId());
-        var usuario = usuarioService.buscarPorId(dto.usuarioId());
-
-        var operacao = OperacaoEntity.builder()
-                .produto(produto)
-                .usuario(usuario)
-                .situacao(Situacao.valueOf(dto.situacao().toUpperCase()))
-                .diaOperacao(dto.diaOperacao())
-                .build();
-
-        var salva = service.salvar(operacao);
+        var salva = service.salvar(dto);
 
         return ResponseEntity.ok(
                 new OperacoesDto(
                         salva.getId(),
                         salva.getSituacao().name(),
-                        salva.getDiaOperacao()
+                        salva.getDiaOperacao(),
+                        salva.getQuantidade(),
+                        salva.getValorTotal()
                 )
         );
     }
+
 
 
     @GetMapping
@@ -89,5 +83,11 @@ public class OperacaoController {
             @RequestParam Situacao novaSituacao) {
 
         return ResponseEntity.ok(service.atualizarSituacao(id, novaSituacao));
+    }
+
+    @GetMapping("/relatorio-vendas")
+    public ResponseEntity<Long> getTotalVendas(@RequestParam LocalDate inicio, @RequestParam LocalDate fim) {
+        Long totalVendas = service.totalVendasNoRange(inicio, fim);
+        return ResponseEntity.ok(totalVendas);
     }
 }
