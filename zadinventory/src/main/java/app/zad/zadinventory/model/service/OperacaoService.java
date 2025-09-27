@@ -36,13 +36,15 @@ public class OperacaoService {
         UsuarioEntity usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + dto.usuarioId()));
 
-        if (produto.getQuantidade() < dto.quantidade()) {
-            throw new RegraNegocioException("Estoque insuficiente para o produto: " + produto.getNome());
-        }
-
         // Atualiza estoque
-        produto.setQuantidade(produto.getQuantidade() - dto.quantidade());
-        produtoRepository.save(produto);
+        if ("REALIZADA".equalsIgnoreCase(dto.situacao())) {
+            if (produto.getQuantidade() < dto.quantidade()) {
+                throw new RegraNegocioException("Estoque insuficiente para o produto: " + produto.getNome());
+            }
+
+            produto.setQuantidade(produto.getQuantidade() - dto.quantidade());
+            produtoRepository.save(produto);
+        }
 
         // Calcula valor total
         BigDecimal valorTotal = produto.getPreco()
