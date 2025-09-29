@@ -71,13 +71,12 @@ public class OperacaoController {
         return ResponseEntity.ok(service.buscarPorUsuario(usuarioId));
     }
 
-    // NOVO MÉTODO PUT PARA ATUALIZAR OPERAÇÃO
     @PutMapping("/{id}")
     public ResponseEntity<OperacaoEntity> atualizar(
             @PathVariable Long id,
-            @RequestBody OperacaoEntity operacao) {
+            @RequestBody OperacoesDTORequest dto) {
 
-        return ResponseEntity.ok(service.atualizar(id, operacao));
+        return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
     @PatchMapping("/{id}/situacao")

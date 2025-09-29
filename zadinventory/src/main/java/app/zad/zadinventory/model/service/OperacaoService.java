@@ -93,43 +93,54 @@ public class OperacaoService {
     }
 
     @Transactional
-    public OperacaoEntity atualizar(Long id, OperacaoEntity operacaoAtualizada) {
+    public OperacaoEntity atualizar(Long id, OperacoesDTORequest dto) {
         OperacaoEntity operacaoExistente = buscarPorId(id);
-        ProdutoEntity produto = operacaoExistente.getProduto();
+        ProdutoEntity produtoAtual = operacaoExistente.getProduto();
 
-        if (operacaoAtualizada.getSituacao() != null
-                && operacaoAtualizada.getSituacao() == Situacao.REALIZADA
-                && operacaoExistente.getSituacao() != Situacao.REALIZADA) {
+        // Se for atualizar a situação
+        if (dto.situacao() != null) {
+            Situacao novaSituacao = Situacao.valueOf(dto.situacao());
 
-            if (produto.getQuantidade() < operacaoAtualizada.getQuantidade()) {
-                throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produto.getNome());
+            if (novaSituacao == Situacao.REALIZADA && operacaoExistente.getSituacao() != Situacao.REALIZADA) {
+                if (produtoAtual.getQuantidade() < dto.quantidade()) {
+                    throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoAtual.getNome());
+                }
+
+                produtoAtual.setQuantidade(produtoAtual.getQuantidade() - dto.quantidade());
+                produtoRepository.save(produtoAtual);
             }
 
-            produto.setQuantidade(produto.getQuantidade() - operacaoAtualizada.getQuantidade());
-            produtoRepository.save(produto);
+            operacaoExistente.setSituacao(novaSituacao);
         }
 
-        // Atualiza a situação se for fornecida
-        if (operacaoAtualizada.getSituacao() != null) {
-            operacaoExistente.setSituacao(operacaoAtualizada.getSituacao());
+        // Atualiza produto
+        if (dto.produtoId() != null) {
+            ProdutoEntity novoProduto = produtoRepository.findById(dto.produtoId())
+                    .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + dto.produtoId()));
+            operacaoExistente.setProduto(novoProduto);
         }
 
-        // Atualiza o produto se for fornecido
-        if (operacaoAtualizada.getProduto() != null && operacaoAtualizada.getProduto().getId() != null) {
-            ProdutoEntity novoProduto = produtoRepository.findById(operacaoAtualizada.getProduto().getId())
-                    .orElseThrow(() -> new RegraNegocioException("Produto não encontrado com ID: " + operacaoAtualizada.getProduto().getId()));
-            operacaoExistente.setProduto(produto);
-        }
-
-        // Atualiza o usuário se for fornecido
-        if (operacaoAtualizada.getUsuario() != null && operacaoAtualizada.getUsuario().getId() != null) {
-            UsuarioEntity usuario = usuarioRepository.findById(operacaoAtualizada.getUsuario().getId())
-                    .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + operacaoAtualizada.getUsuario().getId()));
+        // Atualiza usuário
+        if (dto.usuarioId() != null) {
+            UsuarioEntity usuario = usuarioRepository.findById(dto.usuarioId())
+                    .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado com ID: " + dto.usuarioId()));
             operacaoExistente.setUsuario(usuario);
+        }
+
+        // Atualiza data da operação
+        if (dto.diaOperacao() != null) {
+            operacaoExistente.setDiaOperacao(dto.diaOperacao());
+        }
+
+        // Atualiza quantidade
+        if (dto.quantidade() != null) {
+            operacaoExistente.setQuantidade(dto.quantidade());
         }
 
         return repository.save(operacaoExistente);
     }
+
+
     private void validarOperacao(OperacaoEntity operacao) {
         if (operacao.getProduto() == null || operacao.getProduto().getId() == null) {
             throw new RegraNegocioException("Produto é obrigatório!");
