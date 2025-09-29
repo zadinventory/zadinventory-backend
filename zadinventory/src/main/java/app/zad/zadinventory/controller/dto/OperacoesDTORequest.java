@@ -8,7 +8,7 @@ public record OperacoesDTORequest(
         Long produtoId,
         Long usuarioId,
         String situacao,
-        @JsonFormat(pattern = "yyyy-MM-dd")     LocalDate diaOperacao,
+        @JsonFormat(pattern = "yyyy-MM-dd") LocalDate diaOperacao,
         Integer quantidade
 ) {
 }

@@ -63,7 +63,6 @@ public class OperacaoService {
         return repository.save(operacao);
     }
 
-
     public List<OperacaoEntity> buscarTodos() {
         return repository.findAll();
     }
@@ -99,13 +98,12 @@ public class OperacaoService {
 
         // Se for atualizar a situação
         if (dto.situacao() != null) {
-            Situacao novaSituacao = Situacao.valueOf(dto.situacao());
+            Situacao novaSituacao = Situacao.valueOf(dto.situacao().toUpperCase());
 
             if (novaSituacao == Situacao.REALIZADA && operacaoExistente.getSituacao() != Situacao.REALIZADA) {
                 if (produtoAtual.getQuantidade() < dto.quantidade()) {
                     throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoAtual.getNome());
                 }
-
                 produtoAtual.setQuantidade(produtoAtual.getQuantidade() - dto.quantidade());
                 produtoRepository.save(produtoAtual);
             }
@@ -137,9 +135,23 @@ public class OperacaoService {
             operacaoExistente.setQuantidade(dto.quantidade());
         }
 
+        // Recalcula valor total
+        if (operacaoExistente.getProduto() != null && operacaoExistente.getQuantidade() != null) {
+            BigDecimal valorTotal = operacaoExistente.getProduto().getPreco()
+                    .multiply(BigDecimal.valueOf(operacaoExistente.getQuantidade()));
+            operacaoExistente.setValorTotal(valorTotal);
+        }
+
         return repository.save(operacaoExistente);
     }
 
+
+    // ADICIONAR: Método de exclusão
+    @Transactional
+    public void excluir(Long id) {
+        OperacaoEntity operacao = buscarPorId(id);
+        repository.delete(operacao);
+    }
 
     private void validarOperacao(OperacaoEntity operacao) {
         if (operacao.getProduto() == null || operacao.getProduto().getId() == null) {

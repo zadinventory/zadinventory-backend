@@ -44,8 +44,6 @@ public class OperacaoController {
         );
     }
 
-
-
     @GetMapping
     public ResponseEntity<List<OperacaoEntity>> listar() {
         return ResponseEntity.ok(service.buscarTodos());
@@ -84,7 +82,19 @@ public class OperacaoController {
             @PathVariable Long id,
             @RequestParam Situacao novaSituacao) {
 
+        System.out.println("Recebida requisição para atualizar situação:");
+        System.out.println("ID: " + id);
+        System.out.println("Nova Situação: " + novaSituacao);
+
         return ResponseEntity.ok(service.atualizarSituacao(id, novaSituacao));
+    }
+
+    // ADICIONAR: Endpoint de exclusão
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        System.out.println("Recebida requisição para excluir operação ID: " + id);
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/total-vendas")
