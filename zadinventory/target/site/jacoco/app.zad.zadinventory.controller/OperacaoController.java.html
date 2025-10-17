@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperacaoController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">zadinventory</a> &gt; <a href="index.source.html" class="el_package">app.zad.zadinventory.controller</a> &gt; <span class="el_source">OperacaoController.java</span></div><h1>OperacaoController.java</h1><pre class="source lang-java linenums">package app.zad.zadinventory.controller;
+
+import app.zad.zadinventory.controller.dto.OperacoesDto;
+import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.RelatorioVendasProdutoDto;
+import app.zad.zadinventory.controller.dto.TotalVendasDto;
+import app.zad.zadinventory.model.entity.OperacaoEntity;
+import app.zad.zadinventory.model.enums.Situacao;
+import app.zad.zadinventory.model.repository.OperacaoRepository;
+import app.zad.zadinventory.model.service.OperacaoService;
+import app.zad.zadinventory.model.service.ProdutoService;
+import app.zad.zadinventory.model.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/operacoes&quot;)
+@RequiredArgsConstructor
+public class OperacaoController {
+
+    private final OperacaoService service;
+    private final OperacaoRepository operacaoRepository;
+    private final ProdutoService produtoService;
+    private final UsuarioService usuarioService;
+
+    @PostMapping
+    public ResponseEntity&lt;OperacoesDto&gt; criar(@RequestBody OperacoesDTORequest dto) {
+<span class="nc" id="L34">        var salva = service.salvar(dto);</span>
+
+<span class="nc" id="L36">        return ResponseEntity.ok(</span>
+                new OperacoesDto(
+<span class="nc" id="L38">                        salva.getId(),</span>
+<span class="nc" id="L39">                        salva.getSituacao().name(),</span>
+<span class="nc" id="L40">                        salva.getDiaOperacao(),</span>
+<span class="nc" id="L41">                        salva.getQuantidade(),</span>
+<span class="nc" id="L42">                        salva.getValorTotal()</span>
+                )
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;OperacaoEntity&gt;&gt; listar() {
+<span class="nc" id="L49">        return ResponseEntity.ok(service.buscarTodos());</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;OperacaoEntity&gt; buscarPorId(@PathVariable Long id) {
+<span class="nc" id="L54">        return ResponseEntity.ok(service.buscarPorId(id));</span>
+    }
+
+    @GetMapping(&quot;/por-situacao&quot;)
+    public ResponseEntity&lt;List&lt;OperacaoEntity&gt;&gt; buscarPorSituacao(@RequestParam Situacao situacao) {
+<span class="nc" id="L59">        return ResponseEntity.ok(service.buscarPorSituacao(situacao));</span>
+    }
+
+    @GetMapping(&quot;/por-produto/{produtoId}&quot;)
+    public ResponseEntity&lt;List&lt;OperacaoEntity&gt;&gt; buscarPorProduto(@PathVariable Long produtoId) {
+<span class="nc" id="L64">        return ResponseEntity.ok(service.buscarPorProduto(produtoId));</span>
+    }
+
+    @GetMapping(&quot;/por-usuario/{usuarioId}&quot;)
+    public ResponseEntity&lt;List&lt;OperacaoEntity&gt;&gt; buscarPorUsuario(@PathVariable Long usuarioId) {
+<span class="nc" id="L69">        return ResponseEntity.ok(service.buscarPorUsuario(usuarioId));</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;OperacaoEntity&gt; atualizar(
+            @PathVariable Long id,
+            @RequestBody OperacoesDTORequest dto) {
+
+<span class="nc" id="L77">        return ResponseEntity.ok(service.atualizar(id, dto));</span>
+    }
+
+    @PatchMapping(&quot;/{id}/situacao&quot;)
+    public ResponseEntity&lt;OperacaoEntity&gt; atualizarSituacao(
+            @PathVariable Long id,
+            @RequestParam Situacao novaSituacao) {
+
+<span class="nc" id="L85">        System.out.println(&quot;Recebida requisição para atualizar situação:&quot;);</span>
+<span class="nc" id="L86">        System.out.println(&quot;ID: &quot; + id);</span>
+<span class="nc" id="L87">        System.out.println(&quot;Nova Situação: &quot; + novaSituacao);</span>
+
+<span class="nc" id="L89">        return ResponseEntity.ok(service.atualizarSituacao(id, novaSituacao));</span>
+    }
+
+    // ADICIONAR: Endpoint de exclusão
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; excluir(@PathVariable Long id) {
+<span class="nc" id="L95">        System.out.println(&quot;Recebida requisição para excluir operação ID: &quot; + id);</span>
+<span class="nc" id="L96">        service.excluir(id);</span>
+<span class="nc" id="L97">        return ResponseEntity.noContent().build();</span>
+    }
+
+    @GetMapping(&quot;/total-vendas&quot;)
+    public ResponseEntity&lt;TotalVendasDto&gt; totalVendas(
+            @RequestParam(&quot;inicio&quot;) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(&quot;fim&quot;) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ) {
+<span class="nc" id="L105">        return ResponseEntity.ok(service.totalVendas(inicio, fim));</span>
+    }
+
+    @GetMapping(&quot;/total-vendas-produto&quot;)
+    public ResponseEntity&lt;List&lt;RelatorioVendasProdutoDto&gt;&gt; relatorioVendasPorProduto(
+            @RequestParam(&quot;inicio&quot;) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam(&quot;fim&quot;) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim
+    ){
+
+<span class="nc" id="L114">        return ResponseEntity.ok(service.relatorioVendasPorProduto(inicio, fim));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

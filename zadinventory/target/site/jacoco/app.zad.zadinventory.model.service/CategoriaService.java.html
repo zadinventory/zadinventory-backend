@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CategoriaService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">zadinventory</a> &gt; <a href="index.source.html" class="el_package">app.zad.zadinventory.model.service</a> &gt; <span class="el_source">CategoriaService.java</span></div><h1>CategoriaService.java</h1><pre class="source lang-java linenums">package app.zad.zadinventory.model.service;
+
+import app.zad.zadinventory.model.entity.CategoriaEntity;
+import app.zad.zadinventory.model.exception.RegraNegocioException;
+import app.zad.zadinventory.model.repository.CategoriaRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@Transactional
+public class CategoriaService {
+
+    private final CategoriaRepository repository;
+
+<span class="fc" id="L18">    public CategoriaService(CategoriaRepository repository) {</span>
+<span class="fc" id="L19">        this.repository = repository;</span>
+<span class="fc" id="L20">    }</span>
+
+    public CategoriaEntity salvar(CategoriaEntity categoria) {
+<span class="nc" id="L23">        validarCategoriaBasica(categoria);</span>
+
+<span class="nc bnc" id="L25" title="All 4 branches missed.">        if (categoria.getDescricao() == null || categoria.getDescricao().isBlank()) {</span>
+<span class="nc" id="L26">            categoria.setDescricao(&quot;Descrição padrão&quot;);</span>
+        }
+
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (repository.existsByNomeIgnoreCase(categoria.getNome())) {</span>
+<span class="nc" id="L30">            throw new RegraNegocioException(&quot;Já existe categoria com esse nome: &quot; + categoria.getNome());</span>
+        }
+
+<span class="nc" id="L33">        return repository.save(categoria);</span>
+    }
+
+    public CategoriaEntity atualizar(Long id, CategoriaEntity categoria) {
+<span class="nc" id="L37">        CategoriaEntity existente = repository.findById(id)</span>
+<span class="nc" id="L38">                .orElseThrow(() -&gt; new RegraNegocioException(&quot;Categoria não encontrada com id: &quot; + id));</span>
+
+<span class="nc" id="L40">        validarCategoriaBasica(categoria);</span>
+
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (!existente.getNome().equalsIgnoreCase(categoria.getNome())) {</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            if (repository.existsByNomeIgnoreCase(categoria.getNome())) {</span>
+<span class="nc" id="L44">                throw new RegraNegocioException(&quot;Já existe outra categoria com o nome: &quot; + categoria.getNome());</span>
+            }
+<span class="nc" id="L46">            existente.setNome(categoria.getNome());</span>
+        }
+
+<span class="nc" id="L49">        existente.setDescricao(categoria.getDescricao());</span>
+<span class="nc" id="L50">        return repository.save(existente);</span>
+    }
+
+    public Optional&lt;CategoriaEntity&gt; buscarPorId(Long id) {
+<span class="nc" id="L54">        return repository.findById(id);</span>
+    }
+
+    public Optional&lt;CategoriaEntity&gt; buscarComProdutosPorId(Long id) {
+<span class="nc" id="L58">        return repository.findComProdutosById(id);</span>
+    }
+
+    // Método atualizado para usar findAll() padrão
+    public List&lt;CategoriaEntity&gt; buscarTodos() {
+<span class="nc" id="L63">        return repository.findAll();</span>
+    }
+
+    public List&lt;CategoriaEntity&gt; buscarPorNome(String nome) {
+<span class="nc" id="L67">        return repository.findByNomeContainingIgnoreCase(nome);</span>
+    }
+
+    public List&lt;CategoriaEntity&gt; buscarPorTermo(String termo) {
+<span class="nc" id="L71">        return repository.buscarPorTermo(termo);</span>
+    }
+
+    public void deletar(Long id) {
+<span class="nc" id="L75">        CategoriaEntity existente = repository.findComProdutosById(id)</span>
+<span class="nc" id="L76">                .orElseThrow(() -&gt; new RegraNegocioException(&quot;Categoria não encontrada com id: &quot; + id));</span>
+
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (!existente.getProdutos().isEmpty()) {</span>
+<span class="nc" id="L79">            throw new RegraNegocioException(&quot;Não é possível excluir categoria vinculada a produtos&quot;);</span>
+        }
+
+<span class="nc" id="L82">        repository.delete(existente);</span>
+<span class="nc" id="L83">    }</span>
+
+    private void validarCategoriaBasica(CategoriaEntity categoria) {
+<span class="nc bnc" id="L86" title="All 4 branches missed.">        if (categoria.getNome() == null || categoria.getNome().isBlank()) {</span>
+<span class="nc" id="L87">            throw new RegraNegocioException(&quot;O campo nome é obrigatório&quot;);</span>
+        }
+<span class="nc" id="L89">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

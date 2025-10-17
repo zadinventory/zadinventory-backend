@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperacaoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">zadinventory</a> &gt; <a href="index.source.html" class="el_package">app.zad.zadinventory.model.service</a> &gt; <span class="el_source">OperacaoService.java</span></div><h1>OperacaoService.java</h1><pre class="source lang-java linenums">package app.zad.zadinventory.model.service;
+
+import app.zad.zadinventory.controller.dto.OperacoesDTORequest;
+import app.zad.zadinventory.controller.dto.RelatorioVendasProdutoDto;
+import app.zad.zadinventory.controller.dto.TotalVendasDto;
+import app.zad.zadinventory.model.entity.OperacaoEntity;
+import app.zad.zadinventory.model.entity.ProdutoEntity;
+import app.zad.zadinventory.model.entity.UsuarioEntity;
+import app.zad.zadinventory.model.enums.Situacao;
+import app.zad.zadinventory.model.exception.RegraNegocioException;
+import app.zad.zadinventory.model.repository.OperacaoRepository;
+import app.zad.zadinventory.model.repository.ProdutoRepository;
+import app.zad.zadinventory.model.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class OperacaoService {
+
+    private final OperacaoRepository repository;
+    private final ProdutoRepository produtoRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    @Transactional
+    public OperacaoEntity salvar(OperacoesDTORequest dto) {
+<span class="nc" id="L33">        ProdutoEntity produto = produtoRepository.findById(dto.produtoId())</span>
+<span class="nc" id="L34">                .orElseThrow(() -&gt; new RegraNegocioException(&quot;Produto não encontrado com ID: &quot; + dto.produtoId()));</span>
+
+<span class="nc" id="L36">        UsuarioEntity usuario = usuarioRepository.findById(dto.usuarioId())</span>
+<span class="nc" id="L37">                .orElseThrow(() -&gt; new RegraNegocioException(&quot;Usuário não encontrado com ID: &quot; + dto.usuarioId()));</span>
+
+        // Atualiza estoque
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (&quot;REALIZADA&quot;.equalsIgnoreCase(dto.situacao())) {</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            if (produto.getQuantidade() &lt; dto.quantidade()) {</span>
+<span class="nc" id="L42">                throw new RegraNegocioException(&quot;Estoque insuficiente para o produto: &quot; + produto.getNome());</span>
+            }
+
+<span class="nc" id="L45">            produto.setQuantidade(produto.getQuantidade() - dto.quantidade());</span>
+<span class="nc" id="L46">            produtoRepository.save(produto);</span>
+        }
+
+        // Calcula valor total
+<span class="nc" id="L50">        BigDecimal valorTotal = produto.getPreco()</span>
+<span class="nc" id="L51">                .multiply(BigDecimal.valueOf(dto.quantidade()));</span>
+
+        // Cria a operação
+<span class="nc" id="L54">        var operacao = OperacaoEntity.builder()</span>
+<span class="nc" id="L55">                .produto(produto)</span>
+<span class="nc" id="L56">                .usuario(usuario)</span>
+<span class="nc" id="L57">                .situacao(Situacao.valueOf(dto.situacao().toUpperCase()))</span>
+<span class="nc" id="L58">                .diaOperacao(dto.diaOperacao())</span>
+<span class="nc" id="L59">                .quantidade(dto.quantidade())</span>
+<span class="nc" id="L60">                .valorTotal(valorTotal)</span>
+<span class="nc" id="L61">                .build();</span>
+
+<span class="nc" id="L63">        return repository.save(operacao);</span>
+    }
+
+    public List&lt;OperacaoEntity&gt; buscarTodos() {
+<span class="nc" id="L67">        return repository.findAll();</span>
+    }
+
+    public OperacaoEntity buscarPorId(Long id) {
+<span class="nc" id="L71">        return repository.findComRelacionamentosById(id)</span>
+<span class="nc" id="L72">                .orElseThrow(() -&gt; new RegraNegocioException(&quot;Operação não encontrada!&quot;));</span>
+    }
+
+    public List&lt;OperacaoEntity&gt; buscarPorSituacao(Situacao situacao) {
+<span class="nc" id="L76">        return repository.findBySituacao(situacao);</span>
+    }
+
+    public List&lt;OperacaoEntity&gt; buscarPorProduto(Long produtoId) {
+<span class="nc" id="L80">        return repository.findByProdutoId(produtoId);</span>
+    }
+
+    public List&lt;OperacaoEntity&gt; buscarPorUsuario(Long usuarioId) {
+<span class="nc" id="L84">        return repository.findByUsuarioId(usuarioId);</span>
+    }
+
+    @Transactional
+    public OperacaoEntity atualizarSituacao(Long id, Situacao novaSituacao) {
+<span class="nc" id="L89">        OperacaoEntity operacao = buscarPorId(id);</span>
+<span class="nc" id="L90">        operacao.setSituacao(novaSituacao);</span>
+<span class="nc" id="L91">        return repository.save(operacao);</span>
+    }
+
+    @Transactional
+    public OperacaoEntity atualizar(Long id, OperacoesDTORequest dto) {
+<span class="nc" id="L96">        OperacaoEntity operacaoExistente = buscarPorId(id);</span>
+<span class="nc" id="L97">        ProdutoEntity produtoAtual = operacaoExistente.getProduto();</span>
+
+        // Se for atualizar a situação
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (dto.situacao() != null) {</span>
+<span class="nc" id="L101">            Situacao novaSituacao = Situacao.valueOf(dto.situacao().toUpperCase());</span>
+
+<span class="nc bnc" id="L103" title="All 4 branches missed.">            if (novaSituacao == Situacao.REALIZADA &amp;&amp; operacaoExistente.getSituacao() != Situacao.REALIZADA) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                if (produtoAtual.getQuantidade() &lt; dto.quantidade()) {</span>
+<span class="nc" id="L105">                    throw new IllegalArgumentException(&quot;Estoque insuficiente para o produto: &quot; + produtoAtual.getNome());</span>
+                }
+<span class="nc" id="L107">                produtoAtual.setQuantidade(produtoAtual.getQuantidade() - dto.quantidade());</span>
+<span class="nc" id="L108">                produtoRepository.save(produtoAtual);</span>
+            }
+
+<span class="nc" id="L111">            operacaoExistente.setSituacao(novaSituacao);</span>
+        }
+
+        // Atualiza produto
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (dto.produtoId() != null) {</span>
+<span class="nc" id="L116">            ProdutoEntity novoProduto = produtoRepository.findById(dto.produtoId())</span>
+<span class="nc" id="L117">                    .orElseThrow(() -&gt; new RegraNegocioException(&quot;Produto não encontrado com ID: &quot; + dto.produtoId()));</span>
+<span class="nc" id="L118">            operacaoExistente.setProduto(novoProduto);</span>
+        }
+
+        // Atualiza usuário
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (dto.usuarioId() != null) {</span>
+<span class="nc" id="L123">            UsuarioEntity usuario = usuarioRepository.findById(dto.usuarioId())</span>
+<span class="nc" id="L124">                    .orElseThrow(() -&gt; new RegraNegocioException(&quot;Usuário não encontrado com ID: &quot; + dto.usuarioId()));</span>
+<span class="nc" id="L125">            operacaoExistente.setUsuario(usuario);</span>
+        }
+
+        // Atualiza data da operação
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (dto.diaOperacao() != null) {</span>
+<span class="nc" id="L130">            operacaoExistente.setDiaOperacao(dto.diaOperacao());</span>
+        }
+
+        // Atualiza quantidade
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (dto.quantidade() != null) {</span>
+<span class="nc" id="L135">            operacaoExistente.setQuantidade(dto.quantidade());</span>
+        }
+
+        // Recalcula valor total
+<span class="nc bnc" id="L139" title="All 4 branches missed.">        if (operacaoExistente.getProduto() != null &amp;&amp; operacaoExistente.getQuantidade() != null) {</span>
+<span class="nc" id="L140">            BigDecimal valorTotal = operacaoExistente.getProduto().getPreco()</span>
+<span class="nc" id="L141">                    .multiply(BigDecimal.valueOf(operacaoExistente.getQuantidade()));</span>
+<span class="nc" id="L142">            operacaoExistente.setValorTotal(valorTotal);</span>
+        }
+
+<span class="nc" id="L145">        return repository.save(operacaoExistente);</span>
+    }
+
+
+    // ADICIONAR: Método de exclusão
+    @Transactional
+    public void excluir(Long id) {
+<span class="nc" id="L152">        OperacaoEntity operacao = buscarPorId(id);</span>
+<span class="nc" id="L153">        repository.delete(operacao);</span>
+<span class="nc" id="L154">    }</span>
+
+    private void validarOperacao(OperacaoEntity operacao) {
+<span class="nc bnc" id="L157" title="All 4 branches missed.">        if (operacao.getProduto() == null || operacao.getProduto().getId() == null) {</span>
+<span class="nc" id="L158">            throw new RegraNegocioException(&quot;Produto é obrigatório!&quot;);</span>
+        }
+<span class="nc bnc" id="L160" title="All 4 branches missed.">        if (operacao.getUsuario() == null || operacao.getUsuario().getId() == null) {</span>
+<span class="nc" id="L161">            throw new RegraNegocioException(&quot;Usuário é obrigatório!&quot;);</span>
+        }
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (operacao.getSituacao() == null) {</span>
+<span class="nc" id="L164">            throw new RegraNegocioException(&quot;Situação é obrigatória!&quot;);</span>
+        }
+<span class="nc" id="L166">    }</span>
+
+    public TotalVendasDto totalVendas(LocalDate inicio, LocalDate fim) {
+<span class="nc" id="L169">        Long quantidadeTotal = repository.somaQuantidadePorPeriodo(inicio, fim);</span>
+<span class="nc" id="L170">        BigDecimal valorTotal = repository.somaValorTotalPorPeriodo(inicio, fim);</span>
+
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        return new TotalVendasDto(quantidadeTotal != null ? quantidadeTotal :0L,</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">                valorTotal != null ? valorTotal : BigDecimal.ZERO);</span>
+    }
+
+    public List&lt;RelatorioVendasProdutoDto&gt; relatorioVendasPorProduto(LocalDate inicio, LocalDate fim) {
+<span class="nc" id="L177">        List&lt;Object[]&gt; resultados = repository.relatorioVendasPorProduto(inicio, fim);</span>
+
+<span class="nc" id="L179">        return resultados.stream()</span>
+<span class="nc" id="L180">                .map(obj -&gt; new RelatorioVendasProdutoDto(</span>
+                        (Long) obj[0],
+                        (String) obj[1],
+                        (Long) obj[2],
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                        (obj[3] != null) ? (java.math.BigDecimal) obj[3] : java.math.BigDecimal.ZERO</span>
+                ))
+<span class="nc" id="L186">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
