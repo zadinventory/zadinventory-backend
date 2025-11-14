@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: app.zad.zadinventory.controller.ProdutoControllerTests
--------------------------------------------------------------------------------
-Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.913 s -- in app.zad.zadinventory.controller.ProdutoControllerTests
