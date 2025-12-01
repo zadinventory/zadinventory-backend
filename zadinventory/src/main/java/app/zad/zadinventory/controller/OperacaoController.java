@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/operacoes")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class OperacaoController {
 
     private final OperacaoService service;

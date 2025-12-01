@@ -5,6 +5,7 @@ import app.zad.zadinventory.model.enums.TipoUsuario;
 import app.zad.zadinventory.model.exception.RegraNegocioException;
 import app.zad.zadinventory.model.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +16,14 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
-
+    private final PasswordEncoder passwordEncoder;
     @Transactional
     public UsuarioEntity salvar(UsuarioEntity usuario) {
         validarUsuario(usuario);
 
-        usuario.setEmail(usuario.getEmail().toLowerCase());
+        usuario.setEmail(usuario.getEmail());
+        String senhaCriptografada = passwordEncoder.encode(usuario.getSenha());
+        usuario.setSenha(senhaCriptografada);
 
         return repository.save(usuario);
     }
@@ -47,6 +50,11 @@ public class UsuarioService {
         return repository.buscarPorTipoOrdenado(tipo);
     }
 
+    public UsuarioEntity buscarPorEmailESenha(String email, String senha) {
+        return repository.findByEmailAndSenha(email, senha)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
     @Transactional
     public UsuarioEntity atualizar(Long id, UsuarioEntity usuarioAtualizado) {
         UsuarioEntity usuarioExistente = buscarPorId(id);
@@ -54,6 +62,7 @@ public class UsuarioService {
         usuarioExistente.setTipoUsuario(usuarioAtualizado.getTipoUsuario());
 
         if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isBlank()) {
+            // Por enquanto, não criptografa
             usuarioExistente.setSenha(usuarioAtualizado.getSenha());
         }
 
